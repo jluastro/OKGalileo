@@ -49,18 +49,38 @@ function onload() {
         .attr("dy", ".71em")
         .style("text-anchor", "end")
         .text("Price ($)");
-}
     
-function change_x_axis() {
-    alert("Foo");
+    d3.csv("observatory_sites.csv", function(data) {
+    
+          // get all keys of data hash
+          var keys = Object.keys(data[0]);
 
-    var select = d3.select("#xselect");
-    select.property("value", column);
-    console.log(column);
+          var xDropDown = d3.select("#Xselector");
+          var yDropDown = d3.select("#Yselector");
+          
+          xDropDown.selectAll('option').remove();
+          yDropDown.selectAll('option').remove();
+          for (k in keys) {
+            var o = xDropDown.append('option');
+            o.text(keys[k]);
+            o = yDropDown.append('option');
+            o.text(keys[k]);
+          }
+          
+          //xDropDown.on('onchange', tdcb);
+
+    });
 }
 
-function change_y_axis() {
+function change_x_axis(value) {
+    console.log("New X axis is: " + value);
+
 }
+
+function change_y_axis(value) {
+    console.log("New Y axis is: " + value);
+}
+
 
 function replot_data() {
     svg.selectAll("circle")
