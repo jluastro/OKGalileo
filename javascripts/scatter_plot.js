@@ -16,7 +16,19 @@ var yAxis = d3.svg.axis()
     .scale(y)
     .orient("left");
 
+var public_spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1c2ZuB_FYI0uj-f2a_OSG3uK_OsyCpdgeVSXAUrVqkR8/pubhtml';
+
+function initdata() {
+    sites = Tabletop.init( { key: public_spreadsheet_url,
+                             simpleSheet: false,
+                             wanted: ["Sites"], 
+                             parseNumbers: true } );
+}
+
 function onload() {
+    initdata();
+    alert(sites["timezone"]);
+    
     var svg = d3.select("#fig1").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
@@ -37,21 +49,6 @@ function onload() {
         .attr("dy", ".71em")
         .style("text-anchor", "end")
         .text("Price ($)");
-    
-    d3.csv("observatory_sites.csv", function(data) {
-        // get all keys of data hash
-        var keys = Object.keys(data[0]);
-        
-        var xDropDown = d3.select("#xselect")
-        var yDropDown = d3.select("#yselect")
-        
-        var options = xDropDown.selectAll("option")
-            .data(data)
-            .enter()
-            .append("option");
-        options.text(function (d) { return d.value; })
-            .attr("value", function (d) {return d.value; });
-    });
 }
     
 function change_x_axis() {
@@ -72,5 +69,5 @@ function replot_data() {
         .attr("r", 4)
         .attr("cx", function(d) { return data(d) })
         .attr("cy", function(d) { return data(d) });
-};
+}
 
