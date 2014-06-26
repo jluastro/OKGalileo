@@ -19,15 +19,43 @@ var yAxis = d3.svg.axis()
 var public_spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1c2ZuB_FYI0uj-f2a_OSG3uK_OsyCpdgeVSXAUrVqkR8/pubhtml';
 
 function initdata() {
-    sites = Tabletop.init( { key: public_spreadsheet_url,
+    Tabletop.init( { key: public_spreadsheet_url,
                              simpleSheet: false,
                              wanted: ["Sites"], 
-                             parseNumbers: true } );
+                             parseNumbers: true,
+                             callback: initcb}
+                             );
 }
 
-function onload() {
-    initdata();
-    alert(sites["timezone"]);
+function initcb(tableModel, tabletop) {
+    sheets = tableModel;
+    sites = tableModel.Sites;
+    
+    finishInit();
+}
+
+function finishInit () {
+
+    // Set selectors with column names.
+    var keys = sites.column_names;
+
+    var xDropDown = d3.select("#Xselector");
+    var yDropDown = d3.select("#Yselector");
+    
+    xDropDown.selectAll('option').remove();
+    yDropDown.selectAll('option').remove();
+    for (k in keys) {
+      var o = xDropDown.append('option');
+      o.text(keys[k]);
+      o = yDropDown.append('option');
+      o.text(keys[k]);
+    } 
+    
+    // Set selector initial values.
+    var xAxisCol = sites.column_names[5];
+    var yAxisCol = sites.column_names[8];
+    
+    
     
     var svg = d3.select("#fig1").append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -49,27 +77,11 @@ function onload() {
         .attr("dy", ".71em")
         .style("text-anchor", "end")
         .text("Price ($)");
-    
-    d3.csv("observatory_sites.csv", function(data) {
-    
-          // get all keys of data hash
-          var keys = Object.keys(data[0]);
 
-          var xDropDown = d3.select("#Xselector");
-          var yDropDown = d3.select("#Yselector");
-          
-          xDropDown.selectAll('option').remove();
-          yDropDown.selectAll('option').remove();
-          for (k in keys) {
-            var o = xDropDown.append('option');
-            o.text(keys[k]);
-            o = yDropDown.append('option');
-            o.text(keys[k]);
-          }
-          
-          //xDropDown.on('onchange', tdcb);
 
-    });
+}
+function onload() {
+    initdata();
 }
 
 function change_x_axis(value) {
