@@ -55,8 +55,11 @@ function onload() {
 }
     
 function change_x_axis() {
-    var selectedValue = d3.event.target.value;
-    alert(selectedValue);
+    alert("Foo");
+
+    var select = d3.select("#xselect");
+    select.property("value", column);
+    console.log(column);
 }
 
 function change_y_axis() {
