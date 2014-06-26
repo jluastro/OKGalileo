@@ -45,6 +45,7 @@ text {
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://d3js.org/topojson.v0.min.js"></script>
+<script src="tabletop.js"></script>
 
 <script>
 
@@ -92,15 +93,26 @@ function initdata() {
 function initcb(tableModel, tabletop) {
     sheets = tableModel;
     sites = tableModel.Sites;
+	
+	finishInit();
 }
 
 initdata();
 
-//telescopes = [{type: "Point", coordinates: [sites.elements(0).longitude,sites.elements(0).latitude]}];
-var telescopes = new Array(sites.elements.length);
-for (i = 0; i < sites.elements.length; i++) {
-    telescopes[i] = {type: "Point", coordinates: [sites.elements[i].longitude,sites.elements[i].latitude]};
+var telescopes = null;
+
+function finishInit() {
+ 
+  //telescopes = [{type: "Point", coordinates: [sites.elements(0).longitude,sites.elements(0).latitude]}];
+  telescopes = new Array(sites.elements.length);
+  for (i = 0; i < sites.elements.length; i++) {
+	  telescopes[i] = {type: "Point", coordinates: [-sites.elements[i].longitude,sites.elements[i].latitude]};
+  }
+  
+  startPos();
+  selectPos(0,0);
 }
+
 
 function startPos() {
 d3.json("countries.json", function(error, world) {
@@ -117,12 +129,7 @@ svg.selectAll(".geojson").data(telescopes)
 	.append("path")
 	.attr("class","telescope-point")
 	.attr("d", path);
-testtel = {type: "Point", coordinates: [lon, lat]};
-svg.selectAll(".geojson").data([testtel])
-	.enter()
-	.append("path")
-	.attr("class","telescope-point-active")
-	.attr("d", path);
+
 	});
 }
 function selectPos(lon, lat) {
@@ -148,7 +155,5 @@ svg.selectAll(".geojson").data([testtel])
 	.attr("d", path);
 	});
 }
-startPos();
-selectPos(0,0);
 
 </script>
