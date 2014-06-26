@@ -4,7 +4,7 @@ var public_spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1c2ZuB_FYI0
 
 function initdata() {
     sites=Tabletop.init( { key: public_spreadsheet_url,
-                simpleSheet: false },
-                wanted=["Sites"] 
-                parseNumbers=true);
+                simpleSheet: false,
+                wanted=["Sites"], 
+                parseNumbers=true } );
     }
