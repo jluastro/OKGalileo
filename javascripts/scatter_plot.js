@@ -68,19 +68,20 @@ function finishInit () {
         .attr('id', 'svg');
     
     svg.append("g")
-        .attr("class", "x axis")
+        .attr("class", "xaxis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
     
     svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis)
+        .attr("class", "yaxis")
         .append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 6)
         .attr("dy", ".71em")
         .style("text-anchor", "end")
-        .text("Price ($)");
+        .text("Price ($)")
+        .call(yAxis)
+        ;
 
     replot_data();
 }
@@ -103,7 +104,9 @@ function replot_data() {
     var yCol = yDropDown.node().value;
     
     var xData = function(d) {
-            return d[xCol]
+        
+        console.log (' x = ' + d[xCol]);
+            return d[xCol];
             };
     var yData = function(d) {
             return d[yCol]
@@ -125,8 +128,11 @@ function replot_data() {
         
     var svg = d3.select("#svg");
     
-    svg.select('.xaxis').call(xAxis);
-    svg.select('.yaxis').call(yAxis);
+    svg.select('.xaxis')
+    .call(xAxis);
+    svg.select('.yaxis')
+    .text("Dog")
+    .call(yAxis);
 
 
     svg.selectAll("circle")
