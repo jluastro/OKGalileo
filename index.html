@@ -91,6 +91,21 @@ svg.append("g")
     .attr("dy", ".71em")
     .style("text-anchor", "end")
     .text("Price ($)");
+
+d3.csv("observatory_sites.csv", function(data) {
+          // get all keys of data hash
+          var keys = Object.keys(data[0]);
+
+          var xDropDown = d3.select("#xselect")
+          var yDropDown = d3.select("#yselect")
+
+          var options = xDropDown.selectAll("option")
+               .data(data)
+             .enter()
+               .append("option");
+          options.text(function (d) { return d.value; })
+               .attr("value", function (d) {return d.value; });
+    });
 </script>
           <!-- <script src="okgalileo.js" charset="utf-8"></script> -->
 
