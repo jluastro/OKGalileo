@@ -6,9 +6,10 @@
     <title>Okgalileo by jluastro</title>
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <link rel="stylesheet" href="okgalileo.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script src="javascripts/respond.js"></script>
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="javascripts/d3.min.js" charset="utf-8"></script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -32,15 +33,67 @@
 
       <section>
         <div id="title">
-          <h1>OK Galileo - Telescopes of the World</h1>
+          <h2>OK Galileo - Telescopes of the World</h2>
+          <p>Choose the astronomical site characteristics you want to visualize.</p>
           <p>
-Choose the astronomical site characteristics you want to visualize.
-<select>
-  <option value="">
-  <option value="">
-</select>
-
+          Horizontal Axis:
+          <select name="Xaxis">
+            <option value="altitude">Altitude</option>
+            <option value="longitude">Longitude</option>
+            <option value="timezone">Time Zone</option>
+          </select>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          Vertical Axis:
+          <select name="Yaxis">
+            <option value="altitude">Altitude</option>
+            <option value="longitude">Longitude</option>
+            <option value="timezone">Time Zone</option>
+          </select>
           </p>
+
+          <div id="fig1">Blah!</div>
+          <script>
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 500 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.scale.linear()
+    .range([0, width]);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var svg = d3.select("#fig1").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+
+svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis)
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 6)
+    .attr("dy", ".71em")
+    .style("text-anchor", "end")
+    .text("Price ($)");
+</script>
+          <!-- <script src="okgalileo.js" charset="utf-8"></script> -->
+
           <hr>
           <span class="credits left">Project maintained by <a href="https://github.com/jluastro">jluastro</a></span>
           <span class="credits right">Hosted on GitHub Pages</span>
