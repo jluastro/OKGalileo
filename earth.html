@@ -1,127 +1,154 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-    <script type="text/javascript" src="d3/d3.js"></script>
-    <script type="text/javascript" src="d3/d3.geo.js"></script>
-    <link type="text/css" rel="stylesheet" href="style.css"/>
-    <link type="text/css" rel="stylesheet" href="colorbrewer/colorbrewer.css"/>
-    <style type="text/css">
+<meta charset="utf-8">
+<style>
 
-svg {
-  width: 1280px;
-  height: 800px;
-  pointer-events: all;
-}
-
-circle {
-  fill: #dbe4f0;
-}
-
-path {
-  fill: #aaa;
+.country {
+  fill: #b8b8b8;
   stroke: #fff;
+  stroke-width: .5px;
+  stroke-linejoin: round;
 }
 
-    </style>
-  </head>
-  <body>
-    <div id="body">
-      <div id="footer">
-        d3.geo.azimuthal
-        <div class="hint">drag to rotate the origin</div>
-        <div><select>
-          <option value="equalarea">equalarea</option>
-          <option value="equidistant">equidistant</option>
-          <option value="gnomonic">gnomonic</option>
-          <option value="orthographic" selected>orthographic</option>
-          <option value="stereographic">stereographic</option>
-        </select></div>
-      </div>
-    </div>
-    <script type="text/javascript">
+.graticule {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .3;
+  stroke-width: .5px;
+}
 
-var feature;
+.graticule-outline {
+  fill: none;
+  stroke: #333;
+  stroke-width: 1.5px;
+}
 
-var projection = d3.geo.azimuthal()
-    .scale(380)
-    .origin([-71.03,42.37])
-    .mode("orthographic")
-    .translate([640, 400]);
+.telescope-point {
+  fill: none;
+  stroke: #000000;
+  stroke-width: 1px;
+}
 
-var circle = d3.geo.greatCircle()
-    .origin(projection.origin());
+.telescope-point-active {
+  fill: none;
+  stroke: #ff0000;
+  stroke-width: 1px;
+}
 
-// TODO fix d3.geo.azimuthal to be consistent with scale
-var scale = {
-  orthographic: 380,
-  stereographic: 380,
-  gnomonic: 380,
-  equidistant: 380 / Math.PI * 2,
-  equalarea: 380 / Math.SQRT2
-};
+text {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+  text-anchor: middle;
+}
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v0.min.js"></script>
+
+<script>
+
+var width = 960,
+    height = 500;
+
+var centroid = d3.geo.path()
+    .projection(function(d) { return d; })
+    .centroid;
+
+//var projection = d3.geo.orthographic()
+//    .scale(248)
+//    .clipAngle(90);
+var projection = d3.geo.equirectangular();
 
 var path = d3.geo.path()
     .projection(projection);
 
-var svg = d3.select("#body").append("svg:svg")
-    .attr("width", 1280)
-    .attr("height", 800)
-    .on("mousedown", mousedown);
+var graticule = d3.geo.graticule()
+    .extent([[-180, -90], [180 - .1, 90 - .1]]);
 
-d3.json("world-countries.json", function(collection) {
-  feature = svg.selectAll("path")
-      .data(collection.features)
-    .enter().append("svg:path")
-      .attr("d", clip);
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
 
-  feature.append("svg:title")
-      .text(function(d) { return d.properties.name; });
-});
+//var line = svg.append("path")
+//    .datum(graticule)
+//    .attr("class", "graticule")
+//    .attr("d", path);
+	
+var telescope = [{type: "Point", coordinates: [-20,-30]},{type: "Point", coordinates: [10,10]},{type: "Point", coordinates: [90,0]}];
 
-d3.select(window)
-    .on("mousemove", mousemove)
-    .on("mouseup", mouseup);
 
-d3.select("select").on("change", function() {
-  projection.mode(this.value).scale(scale[this.value]);
-  refresh(750);
-});
+var public_spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1c2ZuB_FYI0uj-f2a_OSG3uK_OsyCpdgeVSXAUrVqkR8/pubhtml';
 
-var m0,
-    o0;
-
-function mousedown() {
-  m0 = [d3.event.pageX, d3.event.pageY];
-  o0 = projection.origin();
-  d3.event.preventDefault();
+function initdata() {
+    Tabletop.init( { key: public_spreadsheet_url,
+                             simpleSheet: false,
+                             wanted: ["Sites"],
+                             parseNumbers: true,
+                             callback: initcb}
+                             );
 }
 
-function mousemove() {
-  if (m0) {
-    var m1 = [d3.event.pageX, d3.event.pageY],
-        o1 = [o0[0] + (m0[0] - m1[0]) / 8, o0[1] + (m1[1] - m0[1]) / 8];
-    projection.origin(o1);
-    circle.origin(o1)
-    refresh();
-  }
+function initcb(tableModel, tabletop) {
+    sheets = tableModel;
+    sites = tableModel.Sites;
 }
 
-function mouseup() {
-  if (m0) {
-    mousemove();
-    m0 = null;
-  }
+initdata();
+
+//telescopes = [{type: "Point", coordinates: [sites.elements(0).longitude,sites.elements(0).latitude]}];
+var telescopes = new Array(sites.elements.length);
+for (i = 0; i < sites.elements.length; i++) {
+    telescopes[i] = {type: "Point", coordinates: [sites.elements[i].longitude,sites.elements[i].latitude]};
 }
 
-function refresh(duration) {
-  (duration ? feature.transition().duration(duration) : feature).attr("d", clip);
-}
+function startPos() {
+d3.json("countries.json", function(error, world) {
+  var countries = topojson.object(world, world.objects.countries).geometries;
 
-function clip(d) {
-  return path(circle.clip(d));
+  var country = svg.selectAll(".country")
+      .data(countries)
+	  .enter().insert("path", ".graticule")
+      .attr("class", "country")
+      .attr("d", path);
+	  
+svg.selectAll(".geojson").data(telescopes)
+	.enter()
+	.append("path")
+	.attr("class","telescope-point")
+	.attr("d", path);
+testtel = {type: "Point", coordinates: [lon, lat]};
+svg.selectAll(".geojson").data([testtel])
+	.enter()
+	.append("path")
+	.attr("class","telescope-point-active")
+	.attr("d", path);
+	});
 }
+function selectPos(lon, lat) {
+d3.json("countries.json", function(error, world) {
+  var countries = topojson.object(world, world.objects.countries).geometries;
 
-    </script>
-  </body>
-</html>
+  var country = svg.selectAll(".country")
+      .data(countries)
+	  .enter().insert("path", ".graticule")
+      .attr("class", "country")
+      .attr("d", path);
+	  
+svg.selectAll(".geojson").data(telescopes)
+	.enter()
+	.append("path")
+	.attr("class","telescope-point")
+	.attr("d", path);
+testtel = {type: "Point", coordinates: [lon, lat]};
+svg.selectAll(".geojson").data([testtel])
+	.enter()
+	.append("path")
+	.attr("class","telescope-point-active")
+	.attr("d", path);
+	});
+}
+startPos();
+selectPos(0,0);
+
+</script>
