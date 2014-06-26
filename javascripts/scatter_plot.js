@@ -39,31 +39,36 @@ function onload() {
         .text("Price ($)");
     
     d3.csv("observatory_sites.csv", function(data) {
-        // get all keys of data hash
-        var keys = Object.keys(data[0]);
-        
-        var xDropDown = d3.select("#xselect")
-        var yDropDown = d3.select("#yselect")
-        
-        var options = xDropDown.selectAll("option")
-            .data(data)
-            .enter()
-            .append("option");
-        options.text(function (d) { return d.value; })
-            .attr("value", function (d) {return d.value; });
+    
+          // get all keys of data hash
+          var keys = Object.keys(data[0]);
+
+          var xDropDown = d3.select("#Xselector");
+          var yDropDown = d3.select("#Yselector");
+          
+          xDropDown.selectAll('option').remove();
+          yDropDown.selectAll('option').remove();
+          for (k in keys) {
+            var o = xDropDown.append('option');
+            o.text(keys[k]);
+            o = yDropDown.append('option');
+            o.text(keys[k]);
+          }
+          
+          //xDropDown.on('onchange', tdcb);
+
     });
 }
-    
-function change_x_axis() {
-    alert("Foo");
 
-    var select = d3.select("#xselect");
-    select.property("value", column);
-    console.log(column);
+function change_x_axis(value) {
+    console.log("New X axis is: " + value);
+
 }
 
-function change_y_axis() {
+function change_y_axis(value) {
+    console.log("New Y axis is: " + value);
 }
+
 
 function replot_data() {
     svg.selectAll("circle")

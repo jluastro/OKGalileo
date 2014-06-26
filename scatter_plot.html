@@ -38,14 +38,14 @@
           <p>Choose the astronomical site characteristics you want to visualize.</p>
           <p>
           Horizontal Axis:
-          <select name="Xselector" onchange="change_x_axis()">
+          <select id="Xselector" name="Xselector" onchange="change_x_axis(this.value)">
             <option value="Altitude">Altitude</option>
             <option value="Longitude">Longitude</option>
             <option value="timezone">Time Zone</option>
           </select>
           &nbsp;&nbsp;&nbsp;&nbsp;
           Vertical Axis:
-          <select name="Yselector" onchange="change_y_axis()">
+          <select id="Yselector" name="Yselector" onchange="change_y_axis(this.value)">
             <option value="Altitude">Altitude</option>
             <option value="Longitude">Longitude</option>
             <option value="timezone">Time Zone</option>
